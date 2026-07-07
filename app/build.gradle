@@ -14,14 +14,14 @@ android {
     def appVersionName = System.getenv("TERMUX_APP_VERSION_NAME") ?: ""
     def apkVersionTag = System.getenv("TERMUX_APK_VERSION_TAG") ?: ""
     def splitAPKsForDebugBuilds = System.getenv("TERMUX_SPLIT_APKS_FOR_DEBUG_BUILDS") ?: "1"
-    def splitAPKsForReleaseBuilds = System.getenv("TERMUX_SPLIT_APKS_FOR_RELEASE_BUILDS") ?: "1"
+    def splitAPKsForReleaseBuilds = System.getenv("TERMUX_SPLIT_APKS_FOR_RELEASE_BUILDS") ?: "0"
 
     defaultConfig {
         applicationId "com.aashumalik.terminal"
         minSdkVersion project.properties.minSdkVersion.toInteger()
         targetSdkVersion project.properties.targetSdkVersion.toInteger()
         versionCode 119
-        versionName "v0.119.0"
+        versionName "1.0.0"
 
         if (appVersionName) versionName = appVersionName.replaceFirst("^v", "")
         validateVersionName(versionName)
@@ -37,11 +37,6 @@ android {
         manifestPlaceholders.TERMUX_TASKER_APP_NAME = "Aashu Terminal:Tasker"
         manifestPlaceholders.TERMUX_WIDGET_APP_NAME = "Aashu Terminal:Widget"
     }
-
-    // FIXED: Removed invalid externalNativeBuild block with cFlags
-    // Ensure these flags are present in src/main/cpp/Android.mk instead:
-    // LOCAL_CFLAGS := -std=c11 -Wall -Wextra -Werror -Os -fno-stack-protector
-    // LOCAL_LDFLAGS := -Wl,--gc-sections
 
     splits {
         abi {
