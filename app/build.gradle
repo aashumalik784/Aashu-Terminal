@@ -23,7 +23,7 @@ android {
         versionCode 119
         versionName "v0.119.0"
 
-        if (appVersionName) versionName = appVersionName
+        if (appVersionName) versionName = appVersionName.replaceFirst("^v", "")
         validateVersionName(versionName)
 
         buildConfigField "String", "TERMUX_PACKAGE_VARIANT", "\"" + project.ext.packageVariant + "\""
