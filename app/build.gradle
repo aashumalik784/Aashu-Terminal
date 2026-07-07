@@ -3,18 +3,18 @@ plugins {
 }
 
 ext {
-    packageVariant = System.getenv("TERMUX_PACKAGE_VARIANT")?: "apt-android-7"
+    packageVariant = System.getenv("TERMUX_PACKAGE_VARIANT") ?: "apt-android-7"
 }
 
 android {
     namespace "com.aashumalik.terminal"
 
     compileSdkVersion project.properties.compileSdkVersion.toInteger()
-    ndkVersion = System.getenv("JITPACK_NDK_VERSION")?: project.properties.ndkVersion
-    def appVersionName = System.getenv("TERMUX_APP_VERSION_NAME")?: ""
-    def apkVersionTag = System.getenv("TERMUX_APK_VERSION_TAG")?: ""
-    def splitAPKsForDebugBuilds = System.getenv("TERMUX_SPLIT_APKS_FOR_DEBUG_BUILDS")?: "1"
-    def splitAPKsForReleaseBuilds = System.getenv("TERMUX_SPLIT_APKS_FOR_RELEASE_BUILDS")?: "0"
+    ndkVersion = System.getenv("JITPACK_NDK_VERSION") ?: project.properties.ndkVersion
+    def appVersionName = System.getenv("TERMUX_APP_VERSION_NAME") ?: ""
+    def apkVersionTag = System.getenv("TERMUX_APK_VERSION_TAG") ?: ""
+    def splitAPKsForDebugBuilds = System.getenv("TERMUX_SPLIT_APKS_FOR_DEBUG_BUILDS") ?: "1"
+    def splitAPKsForReleaseBuilds = System.getenv("TERMUX_SPLIT_APKS_FOR_RELEASE_BUILDS") ?: "0"
 
     defaultConfig {
         applicationId "com.aashumalik.terminal"
@@ -38,17 +38,15 @@ android {
         manifestPlaceholders.TERMUX_WIDGET_APP_NAME = "Aashu Terminal:Widget"
     }
 
-    // FIXED: Removed extra closing brace here
-    externalNativeBuild {
-        ndkBuild {
-            cFlags "-std=c11", "-Wall", "-Wextra", "-Werror", "-Os", "-fno-stack-protector", "-Wl,--gc-sections"
-        }
-    }
+    // FIXED: Removed invalid externalNativeBuild block with cFlags
+    // Ensure these flags are present in src/main/cpp/Android.mk instead:
+    // LOCAL_CFLAGS := -std=c11 -Wall -Wextra -Werror -Os -fno-stack-protector
+    // LOCAL_LDFLAGS := -Wl,--gc-sections
 
     splits {
         abi {
             enable ((gradle.startParameter.taskNames.any { it.contains("Debug") } && splitAPKsForDebugBuilds == "1") ||
-                (gradle.startParameter.taskNames.any { it.contains("Release") } && splitAPKsForReleaseBuilds == "1"))
+                    (gradle.startParameter.taskNames.any { it.contains("Release") } && splitAPKsForReleaseBuilds == "1"))
             reset()
             include 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
             universalApk true
@@ -102,10 +100,10 @@ android {
         variant.outputs.all { output ->
             if (variant.buildType.name == "debug") {
                 def abi = output.getFilter(com.android.build.OutputFile.ABI)
-                outputFileName = new File("aashu-terminal_" + (apkVersionTag? apkVersionTag : project.ext.packageVariant + "-" + "debug") + "_" + (abi? abi : "universal") + ".apk")
+                outputFileName = new File("aashu-terminal_" + (apkVersionTag ? apkVersionTag : project.ext.packageVariant + "-" + "debug") + "_" + (abi ? abi : "universal") + ".apk")
             } else if (variant.buildType.name == "release") {
                 def abi = output.getFilter(com.android.build.OutputFile.ABI)
-                outputFileName = new File("aashu-terminal_" + (apkVersionTag? apkVersionTag : project.ext.packageVariant + "-" + "release") + "_" + (abi? abi : "universal") + ".apk")
+                outputFileName = new File("aashu-terminal_" + (apkVersionTag ? apkVersionTag : project.ext.packageVariant + "-" + "release") + "_" + (abi ? abi : "universal") + ".apk")
             }
         }
     }
@@ -185,7 +183,7 @@ def downloadBootstrap(String arch, String expectedChecksum, String version) {
 
     def checksum = new BigInteger(1, digest.digest()).toString(16)
     while (checksum.length() < 64) { checksum = "0" + checksum }
-    if (checksum!= expectedChecksum) {
+    if (checksum != expectedChecksum) {
         file.delete()
         throw new GradleException("Wrong checksum for " + remoteUrl + ": expected: " + expectedChecksum + ", actual: " + checksum)
     }
