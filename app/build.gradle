@@ -118,7 +118,7 @@ android {
         jniLibs {
             useLegacyPackaging true
         }
-    }
++    }
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
