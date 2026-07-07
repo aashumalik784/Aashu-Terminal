@@ -1,16 +1,16 @@
 name: Build
-
 on:
+  schedule:
+    - cron: '0 0 1 * *'
   workflow_dispatch:
   push:
     branches:
-      - master
       - main
-      - 'github-releases/**'
+      - master
   pull_request:
     branches:
+      - main
       - master
-
 jobs:
   build:
     runs-on: ubuntu-latest
