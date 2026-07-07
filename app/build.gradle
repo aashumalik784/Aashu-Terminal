@@ -38,10 +38,10 @@ android {
         manifestPlaceholders.TERMUX_WIDGET_APP_NAME = "Aashu Terminal:Widget"
     }
 
+    // FIXED: Removed extra closing brace here
     externalNativeBuild {
         ndkBuild {
-    cFlags "-std=c11", "-Wall", "-Wextra", "-Werror", "-Os", "-fno-stack-protector", "-Wl,--gc-sections"
-        }
+            cFlags "-std=c11", "-Wall", "-Wextra", "-Werror", "-Os", "-fno-stack-protector", "-Wl,--gc-sections"
         }
     }
 
