@@ -219,16 +219,11 @@ task downloadBootstraps() {
     }
 }
 
-// ⭐ CRITICAL FIX: Bootstrap files ko NDK build se PEHLE download karein
+// ⭐ SAFE FIX: preBuildProvider use karein (sabhi AGP versions mein kaam karta hai)
 afterEvaluate {
     android.applicationVariants.all { variant ->
-        // NDK build se pehle bootstrap download ho
-        variant.externalNativeBuildProvider.get().dependsOn(downloadBootstraps)
-        // Java compile se pehle bhi
-        variant.javaCompileProvider.get().dependsOn(downloadBootstraps)
-    }
-    // Pre-build task se bhi link karein
-    tasks.matching { it.name.startsWith('externalNativeBuild') || it.name.startsWith('generateJsonModel') }.configureEach {
-        it.dependsOn(downloadBootstraps)
+        variant.preBuildProvider.configure {
+            it.dependsOn(downloadBootstraps)
+        }
     }
 }
