@@ -59,6 +59,7 @@ android {
 
     buildTypes {
         release {
+            signingConfig signingConfigs.debug  // ⭐ YE LINE ADD KI - APK SIGN HOGI
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -219,7 +220,6 @@ task downloadBootstraps() {
     }
 }
 
-// ⭐ SAFE FIX: preBuildProvider use karein (sabhi AGP versions mein kaam karta hai)
 afterEvaluate {
     android.applicationVariants.all { variant ->
         variant.preBuildProvider.configure {
