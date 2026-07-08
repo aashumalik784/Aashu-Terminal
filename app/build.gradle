@@ -38,11 +38,6 @@ android {
         manifestPlaceholders.TERMUX_WIDGET_APP_NAME = "Aashu Terminal:Widget"
     }
 
-    // FIXED: Removed invalid externalNativeBuild block with cFlags
-    // Ensure these flags are present in src/main/cpp/Android.mk instead:
-    // LOCAL_CFLAGS := -std=c11 -Wall -Wextra -Werror -Os -fno-stack-protector
-    // LOCAL_LDFLAGS := -Wl,--gc-sections
-
     splits {
         abi {
             enable ((gradle.startParameter.taskNames.any { it.contains("Debug") } && splitAPKsForDebugBuilds == "1") ||
@@ -64,7 +59,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -78,6 +73,12 @@ android {
         coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
+    }
+
+    externalNativeBuild {
+        ndkBuild {
+            path "src/main/cpp/Android.mk"
+        }
     }
 
     packaging {
@@ -221,34 +222,5 @@ task downloadBootstraps() {
 afterEvaluate {
     android.applicationVariants.all { variant ->
         variant.javaCompileProvider.get().dependsOn(downloadBootstraps)
-    }
-}
-
-// Bootstrap files ko extract karke jniLibs mein copy karein
-task extractBootstraps {
-    doLast {
-        def packageVariant = project.ext.packageVariant
-        def bootstrapDir = file("src/main/cpp")
-        def jniLibsDir = file("src/main/jniLibs")
-        
-        if (packageVariant == "apt-android-7") {
-            def archs = ["aarch64": "arm64-v8a", "arm": "armeabi-v7a", "x86_64": "x86_64", "i686": "x86"]
-            archs.each { arch, abi ->
-                def zipFile = file("$bootstrapDir/bootstrap-$arch.zip")
-                if (zipFile.exists()) {
-                    copy {
-                        from zipTree(zipFile)
-                        into "$jniLibsDir/$abi"
-                    }
-                }
-            }
-        }
-    }
-}
-
-// Har build se pehle extractBootstraps run karein
-afterEvaluate {
-    android.applicationVariants.all { variant ->
-        variant.javaCompileProvider.get().dependsOn(extractBootstraps)
     }
 }
