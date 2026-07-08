@@ -223,3 +223,32 @@ afterEvaluate {
         variant.javaCompileProvider.get().dependsOn(downloadBootstraps)
     }
 }
+
+// Bootstrap files ko extract karke jniLibs mein copy karein
+task extractBootstraps {
+    doLast {
+        def packageVariant = project.ext.packageVariant
+        def bootstrapDir = file("src/main/cpp")
+        def jniLibsDir = file("src/main/jniLibs")
+        
+        if (packageVariant == "apt-android-7") {
+            def archs = ["aarch64": "arm64-v8a", "arm": "armeabi-v7a", "x86_64": "x86_64", "i686": "x86"]
+            archs.each { arch, abi ->
+                def zipFile = file("$bootstrapDir/bootstrap-$arch.zip")
+                if (zipFile.exists()) {
+                    copy {
+                        from zipTree(zipFile)
+                        into "$jniLibsDir/$abi"
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Har build se pehle extractBootstraps run karein
+afterEvaluate {
+    android.applicationVariants.all { variant ->
+        variant.javaCompileProvider.get().dependsOn(extractBootstraps)
+    }
+}
